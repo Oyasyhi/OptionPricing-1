@@ -44,18 +44,18 @@ class LSMCPricer:
 
             current = pd.concat([data['t{}'.format(i - 1)], value['t{}'.format(i)]], axis=1)  # Get two consecutive cols
             ITM = current[current[f't{i-1}'] < opt.strike].copy()
-            ITM.loc[:, f't{i}'] = ITM.loc[:, f't{i}'].apply(option_exercise)
+            if len(ITM.iloc[:, 0]) != 0:  # If there is no ITM, we will not do exercise decision.
+                ITM.loc[:, f't{i}'] = ITM.loc[:, f't{i}'].apply(option_exercise)
 
             # Regression
-            polynomial_coefficients = np.polyfit(ITM.iloc[:, 0], ITM.iloc[:, 1] * df, 2)
+                polynomial_coefficients = np.polyfit(ITM.iloc[:, 0], ITM.iloc[:, 1] * df, 2)
 
             # Calculate prediction value based on the regression results
-            ITM['predicted_' + 't{}'.format(i - 1)] = ITM[f't{i-1}'].apply(predicted_value,
-                                                                           args=tuple(polynomial_coefficients))
-            ITM[f'exercise_return_t{i - 1}'] = ITM.iloc[:, 0].apply(option_exercise)
-            ITM['exercise'] = ITM[f'predicted_t{i - 1}'] < ITM[f'exercise_return_t{i - 1}']
-            value.iloc[list(ITM[ITM['exercise'] == True].index), i - 1] = ITM[ITM['exercise'] == True][
-                f'exercise_return_t{i - 1}']
+                ITM['predicted_' + 't{}'.format(i - 1)] = ITM[f't{i-1}'].apply(predicted_value, args=tuple(polynomial_coefficients))
+                ITM[f'exercise_return_t{i - 1}'] = ITM.iloc[:, 0].apply(option_exercise)
+                ITM['exercise'] = ITM[f'predicted_t{i - 1}'] < ITM[f'exercise_return_t{i - 1}']
+                value.iloc[list(ITM[ITM['exercise'] == True].index), i - 1] = ITM[ITM['exercise'] == True][
+                    f'exercise_return_t{i - 1}']
 
         price = value.iloc[:, 1].apply(lambda x: x * df).mean()
         return price

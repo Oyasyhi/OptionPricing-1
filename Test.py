@@ -2,17 +2,26 @@ from LSMC_Pricer import LSMCPricer
 from BBSR_Pricer import BBSRPricer
 from option import AmericanPutOption
 import statistics
+import numpy as np
 
 if __name__ == "__main__":
-    option = AmericanPutOption(strike=1, ttm=1)
-    LSMC_pricer = LSMCPricer(spot=1, step_size=0.01, rate=0.06, vol=0.2, path_size=10000)
-    BBSR_pricer = BBSRPricer(spot=1, steps_size=0.01, rate=0.06, vol=0.2)
+    def grid(step_size, rate, vol):
+        LSMC_pricer = LSMCPricer(spot=1, step_size=step_size, rate=rate, vol=vol, path_size=10000)
+        BBSR_pricer = BBSRPricer(spot=1, steps_size=step_size, rate=rate, vol=vol)
 
-    repeat_time = 10
-    LSMC_res = [LSMC_pricer(option) for _ in range(repeat_time)]
-    BBSR_res = [BBSR_pricer(option) for _ in range(repeat_time)]
-    diff_res = [LSMC_res[i]-BBSR_res[i] for i in range(repeat_time)]
-    diff_percent_res = [diff_res[i]/BBSR_res[i] for i in range(repeat_time)]
-    print(diff_res, statistics.mean(diff_percent_res), statistics.mean(diff_res), statistics.variance(diff_res))
+        res = {}
+        for i in np.arange(0.1, 2.1, step=0.1):  # strike
+            for j in range(1, 6):  # ttm
+                strike = i
+                ttm = j
+                opt = AmericanPutOption(strike, ttm)
+                LSMC_res = LSMC_pricer(opt)
+                BBSR_res = BBSR_pricer(opt)
+                res.update({f'{strike},{ttm}': [LSMC_res, BBSR_res]})
+                print(i, j)
 
+        return res
+
+    result = grid(0.1, 0.06, 0.2)
+    print(result)
 
