@@ -1,7 +1,6 @@
 from LSMC_Pricer import LSMCPricer
 from BBSR_Pricer import BBSRPricer
 from option import AmericanPutOption
-import statistics
 import numpy as np
 
 if __name__ == "__main__":
@@ -10,7 +9,7 @@ if __name__ == "__main__":
         BBSR_pricer = BBSRPricer(spot=1, steps_size=step_size, rate=rate, vol=vol)
 
         res = {}
-        for i in np.arange(0.1, 2.1, step=0.1):  # strike
+        for i in np.arange(0.6, 2.1, step=0.05):  # strike
             for j in range(1, 6):  # ttm
                 strike = i
                 ttm = j
@@ -23,5 +22,6 @@ if __name__ == "__main__":
         return res
 
     result = grid(0.1, 0.06, 0.2)
-    print(result)
+    for key in result.keys():
+        print(key, result[key][0], result[key][1], result[key][0] - result[key][1], (result[key][0] - result[key][1])/result[key][1])
 
