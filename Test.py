@@ -51,20 +51,6 @@ if __name__ == "__main__":
             res.loc[len(res.index)] = [i, LSMC_res, BBSR_res]
             print(i)
         return res
-    def spot2_test(step_size, rate, vol, spot, strike, ttm):
-        LSMC_pricer = LSMCPricer(spot=spot, step_size=step_size, rate=rate, vol=vol, path_size=10000)
-        BBSR_pricer = BBSRPricer(spot=spot, steps_size=step_size, rate=rate, vol=vol)
-        opt = AmericanPutOption(strike, ttm)
-        res = pd.DataFrame(columns = ["Spot", "LSMC", "BBSR"])
-        n = 100
-        size = ttm / n
-        for i in np.arange(ttm, 0 - size, step = size):
-            opt.ttm = i
-            LSMC_res = LSMC_pricer(opt)
-            BBSR_res = BBSR_pricer(opt)
-            res.loc[len(res.index)] = [i, LSMC_res, BBSR_res]
-            print(i)
-        return res
 
     # result = grid(0.1, 0.06, 0.2)
     def spot_test(step_size, rate, vol, spot, strike, ttm):
