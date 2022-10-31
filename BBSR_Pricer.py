@@ -3,7 +3,6 @@ import scipy.stats as sps
 import math
 import option
 
-
 def BSM(S: float, K: float,q: float, r: float, sigma: float, T: float, option_type: str) -> float:
     d1 = (np.log(S/K) + (r + 0.5 * sigma ** 2)*T) / (sigma * np.sqrt(T))
     d2 = d1 - sigma*np.sqrt(T)
@@ -13,7 +12,6 @@ def BSM(S: float, K: float,q: float, r: float, sigma: float, T: float, option_ty
         return K * np.exp(-r * T) * sps.norm.cdf(-d2) - S * np.exp(-q * T) * sps.norm.cdf(-d1)
     else:
         return -1.0
-
 
 def BBS(steps: int,S: float, K: float, r: float, sigma: float, T: float, option_type: str) -> float:
     dt = T/steps
@@ -61,7 +59,6 @@ def BBS(steps: int,S: float, K: float, r: float, sigma: float, T: float, option_
                 option_val[j, diag - j] = max(np.exp(-r * dt) * (p * option_val[j + 1, diag - j] + q * option_val[j, diag - j + 1]), K - stock_price[j, diag - j], 0)
 
     return option_val[0,0]
-
 
 def BBSR(steps: int, S: float, K: float, r: float, sigma: float, T: float, option_type)-> float:
     return 2 * BBS(2 * steps, S, K, r, sigma, T, option_type) - BBS(steps, S, K, r, sigma, T, option_type)
